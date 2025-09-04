@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda Digital - Barbearia Premium</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-gray-900 to-gray-700 min-h-screen">
+    <div class="container mx-auto p-4">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="flex justify-center mb-4">
+                <!-- Poste de Barbeiro Clássico -->
+                <div class="relative">
+                    <svg width="120" height="120" viewBox="0 0 120 120">
+                        <!-- Base do poste -->
+                        <rect x="45" y="100" width="30" height="15" fill="#2D1810" rx="3"/>
+                        
+                        <!-- Topo do poste -->
+                        <ellipse cx="60" cy="15" rx="12" ry="8" fill="#FFD700"/>
+                        <ellipse cx="60" cy="12" rx="10" ry="6" fill="#FFF"/>
+                        
+                        <!-- Cilindro principal com listras -->
+                        <rect x="50" y="20" width="20" height="80" fill="#FFF"/>
+                        
+                        <!-- Listras vermelhas -->
+                        <rect x="50" y="22" width="20" height="4" fill="#DC2626"/>
+                        <rect x="50" y="30" width="20" height="4" fill="#DC2626"/>
+                        <rect x="50" y="38" width="20" height="4" fill="#DC2626"/>
+                        <rect x="50" y="46" width="20" height="4" fill="#DC2626"/>
+                        <rect x="50" y="54" width="20" height="4" fill="#DC2626"/>
+                        <rect x="50" y="62" width="20" height="4" fill="#DC2626"/>
+                        <rect x="50" y="70" width="20" height="4" fill="#DC2626"/>
+                        <rect x="50" y="78" width="20" height="4" fill="#DC2626"/>
+                        <rect x="50" y="86" width="20" height="4" fill="#DC2626"/>
+                        <rect x="50" y="94" width="20" height="4" fill="#DC2626"/>
+                        
+                        <!-- Listras azuis -->
+                        <rect x="50" y="26" width="20" height="4" fill="#1D4ED8"/>
+                        <rect x="50" y="34" width="20" height="4" fill="#1D4ED8"/>
+                        <rect x="50" y="42" width="20" height="4" fill="#1D4ED8"/>
+                        <rect x="50" y="50" width="20" height="4" fill="#1D4ED8"/>
+                        <rect x="50" y="58" width="20" height="4" fill="#1D4ED8"/>
+                        <rect x="50" y="66" width="20" height="4" fill="#1D4ED8"/>
+                        <rect x="50" y="74" width="20" height="4" fill="#1D4ED8"/>
+                        <rect x="50" y="82" width="20" height="4" fill="#1D4ED8"/>
+                        <rect x="50" y="90" width="20" height="4" fill="#1D4ED8"/>
+                        
+                        <!-- Efeito de brilho no cilindro -->
+                        <rect x="52" y="20" width="3" height="80" fill="#FFF" opacity="0.3"/>
+                        
+                        <!-- Bordas do cilindro -->
+                        <rect x="50" y="20" width="20" height="80" fill="none" stroke="#666" stroke-width="1"/>
+                        
+                        <!-- Base inferior -->
+                        <ellipse cx="60" cy="100" rx="12" ry="4" fill="#2D1810"/>
+                    </svg>
+                </div>
+            </div>
+            <h1 class="text-4xl font-bold text-white mb-2">✂️ Barbearia Premium</h1>
+            <p class="text-gray-300">Agende seu horário e escolha seus serviços</p>
+        </div>
+
+        <!-- Modal para Dados do Cliente -->
+        <div id="modalCliente" class="fixed inset-0 bg-black bg-opacity-50 z-60 hidden flex items-center justify-center">
+            <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Dados do Cliente</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label>
+                        <input type="text" id="nomeCliente" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Digite seu nome completo">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
+                        <input type="tel" id="telefoneCliente" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="(11) 99999-9999">
+                    </div>
+                </div>
+                <div class="flex space-x-3 mt-6">
+                    <button onclick="fecharModal()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg">
+                        Cancelar
+                    </button>
+                    <button onclick="confirmarComDados()" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">
+                        Confirmar Agendamento
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Carrinho Flutuante -->
+        <div id="carrinhoFlutuante" class="fixed bottom-4 right-4 z-50 transition-all duration-300 transform translate-y-full opacity-0">
+            <div class="bg-white rounded-xl shadow-2xl border-2 border-green-500 max-w-sm">
+                <!-- Cabeçalho do Carrinho -->
+                <div class="bg-green-600 text-white p-3 rounded-t-xl cursor-pointer" onclick="toggleCarrinho()">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-lg">🛒</span>
+                            <span class="font-bold">Carrinho</span>
+                            <span id="contadorItens" class="bg-white text-green-600 rounded-full px-2 py-1 text-xs font-bold">0</span>
+                        </div>
+                        <span id="setaCarrinho" class="text-sm font-bold">FECHAR</span>
+                    </div>
+                </div>
+                
+                <!-- Conteúdo do Carrinho -->
+                <div id="conteudoCarrinho" class="p-4 max-h-80 overflow-y-auto">
+                    <div id="carrinhoItens" class="space-y-2 mb-4">
+                        <p class="text-gray-500 text-sm text-center">Nenhum serviço selecionado</p>
+                    </div>
+                    
+                    <div class="border-t pt-3">
+                        <div class="flex justify-between items-center font-bold text-lg mb-3">
+                            <span>Total:</span>
+                            <span id="totalFlutuante" class="text-green-600">R$ 0,00</span>
+                        </div>
+                        
+                        <button id="finalizarCarrinho" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors" disabled>
+                            Finalizar Agendamento
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-6">
+            <!-- Serviços Disponíveis -->
+            <div class="bg-white rounded-xl shadow-xl p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                    💼 Nossos Serviços
+                </h2>
+                <div class="space-y-3" id="servicos">
+                    <div class="service-item border rounded-lg p-3 hover:bg-gray-50 cursor-pointer transition-colors" data-service="cabelo" data-price="25" data-duration="30">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h3 class="font-semibold">Corte de Cabelo</h3>
+                                <p class="text-sm text-gray-600">30 minutos</p>
+                            </div>
+                            <span class="text-green-600 font-bold">R$ 25,00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="service-item border rounded-lg p-3 hover:bg-gray-50 cursor-pointer transition-colors" data-service="barba" data-price="20" data-duration="20">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h3 class="font-semibold">Barba</h3>
+                                <p class="text-sm text-gray-600">20 minutos</p>
+                            </div>
+                            <span class="text-green-600 font-bold">R$ 20,00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="service-item border rounded-lg p-3 hover:bg-gray-50 cursor-pointer transition-colors" data-service="sobrancelha" data-price="15" data-duration="15">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h3 class="font-semibold">Sobrancelha</h3>
+                                <p class="text-sm text-gray-600">15 minutos</p>
+                            </div>
+                            <span class="text-green-600 font-bold">R$ 15,00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="service-item border rounded-lg p-3 hover:bg-gray-50 cursor-pointer transition-colors" data-service="coloracao" data-price="60" data-duration="90">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h3 class="font-semibold">Coloração</h3>
+                                <p class="text-sm text-gray-600">90 minutos</p>
+                            </div>
+                            <span class="text-green-600 font-bold">R$ 60,00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="service-item border rounded-lg p-3 hover:bg-gray-50 cursor-pointer transition-colors" data-service="luzes" data-price="80" data-duration="120">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h3 class="font-semibold">Luzes</h3>
+                                <p class="text-sm text-gray-600">120 minutos</p>
+                            </div>
+                            <span class="text-green-600 font-bold">R$ 80,00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agenda Semanal -->
+            <div class="bg-white rounded-xl shadow-xl p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">📅 Agenda da Semana</h2>
+                    <div class="flex space-x-2">
+                        <button id="semanaAnterior" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded">←</button>
+                        <button id="proximaSemana" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded">→</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-7 gap-2 mb-4">
+                    <div class="text-center font-semibold text-gray-700 p-2">Dom</div>
+                    <div class="text-center font-semibold text-gray-700 p-2">Seg</div>
+                    <div class="text-center font-semibold text-gray-700 p-2">Ter</div>
+                    <div class="text-center font-semibold text-gray-700 p-2">Qua</div>
+                    <div class="text-center font-semibold text-gray-700 p-2">Qui</div>
+                    <div class="text-center font-semibold text-gray-700 p-2">Sex</div>
+                    <div class="text-center font-semibold text-gray-700 p-2">Sáb</div>
+                </div>
+
+                <div id="calendario" class="grid grid-cols-7 gap-2">
+                    <!-- Dias serão gerados pelo JavaScript -->
+                </div>
+
+                <!-- Horários do Dia Selecionado -->
+                <div class="mt-6 border-t pt-4">
+                    <h3 class="font-bold text-gray-800 mb-3" id="diaSelecionado">Selecione um dia</h3>
+                    <div id="horariosDisponiveis" class="grid grid-cols-4 gap-2">
+                        <!-- Horários serão gerados pelo JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Botão de Agendamento -->
+                <div class="mt-6 text-center">
+                    <button id="confirmarAgendamento" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed" disabled>
+                        Confirmar Agendamento
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado da aplicação
+        let carrinho = [];
+        let diaSelecionado = null;
+        let horarioSelecionado = null;
+        let semanaAtual = 0;
+        
+        // Agendamentos já marcados (simulação)
+        let agendamentos = {
+            '2024-01-15': ['09:00', '14:30', '16:00'],
+            '2024-01-16': ['10:00', '11:30', '15:00'],
+            '2024-01-17': ['08:30', '13:00', '17:00']
+        };
+
+        // Horários de funcionamento
+        const horariosFuncionamento = [
+            '08:00', '08:30', '09:00', '09:30', '10:00', '10:30',
+            '11:00', '11:30', '12:00', '12:30', '13:00', '13:30',
+            '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
+            '17:00', '17:30', '18:00', '18:30', '19:00', '19:30'
+        ];
+
+        // Adicionar serviço ao carrinho
+        document.querySelectorAll('.service-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const service = item.dataset.service;
+                const price = parseFloat(item.dataset.price);
+                const serviceName = item.querySelector('h3').textContent;
+                
+                // Verificar se já está no carrinho
+                const existingItem = carrinho.find(item => item.service === service);
+                if (existingItem) {
+                    existingItem.quantity++;
+                } else {
+                    carrinho.push({
+                        service: service,
+                        name: serviceName,
+                        price: price,
+                        quantity: 1
+                    });
+                }
+                
+                atualizarCarrinho();
+                item.classList.add('bg-green-100', 'border-green-500');
+                setTimeout(() => {
+                    item.classList.remove('bg-green-100', 'border-green-500');
+                }, 300);
+            });
+        });
+
+        function atualizarCarrinho() {
+            const carrinhoItens = document.getElementById('carrinhoItens');
+            const totalFlutuante = document.getElementById('totalFlutuante');
+            const contadorItens = document.getElementById('contadorItens');
+            const carrinhoFlutuante = document.getElementById('carrinhoFlutuante');
+            
+            // Atualizar contador de itens
+            const totalItens = carrinho.reduce((sum, item) => sum + item.quantity, 0);
+            contadorItens.textContent = totalItens;
+            
+            // Mostrar/esconder carrinho flutuante
+            if (totalItens > 0) {
+                carrinhoFlutuante.classList.remove('translate-y-full', 'opacity-0');
+                carrinhoFlutuante.classList.add('translate-y-0', 'opacity-100');
+            } else {
+                carrinhoFlutuante.classList.add('translate-y-full', 'opacity-0');
+                carrinhoFlutuante.classList.remove('translate-y-0', 'opacity-100');
+            }
+            
+            if (carrinho.length === 0) {
+                carrinhoItens.innerHTML = '<p class="text-gray-500 text-sm text-center">Nenhum serviço selecionado</p>';
+                totalFlutuante.textContent = 'R$ 0,00';
+                return;
+            }
+            
+            let html = '';
+            let total = 0;
+            
+            carrinho.forEach((item, index) => {
+                const subtotal = item.price * item.quantity;
+                total += subtotal;
+                
+                html += `
+                    <div class="flex justify-between items-center text-sm bg-gray-50 p-2 rounded">
+                        <div class="flex-1">
+                            <div class="font-medium">${item.name}</div>
+                            <div class="text-xs text-gray-600">${item.quantity}x R$ ${item.price.toFixed(2)}</div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="font-bold text-green-600">R$ ${subtotal.toFixed(2)}</span>
+                            <button onclick="removerDoCarrinho(${index})" class="text-red-500 hover:text-red-700 font-bold text-lg">×</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            carrinhoItens.innerHTML = html;
+            totalFlutuante.textContent = `R$ ${total.toFixed(2)}`;
+            
+            verificarAgendamento();
+        }
+
+        function removerDoCarrinho(index) {
+            carrinho.splice(index, 1);
+            atualizarCarrinho();
+        }
+
+        function gerarCalendario() {
+            const hoje = new Date();
+            const inicioSemana = new Date(hoje);
+            inicioSemana.setDate(hoje.getDate() - hoje.getDay() + (semanaAtual * 7));
+            
+            const calendario = document.getElementById('calendario');
+            calendario.innerHTML = '';
+            
+            for (let i = 0; i < 7; i++) {
+                const dia = new Date(inicioSemana);
+                dia.setDate(inicioSemana.getDate() + i);
+                
+                const diaDiv = document.createElement('div');
+                diaDiv.className = 'text-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors';
+                diaDiv.innerHTML = `
+                    <div class="font-semibold">${dia.getDate()}</div>
+                    <div class="text-xs text-gray-600">${dia.toLocaleDateString('pt-BR', { month: 'short' })}</div>
+                `;
+                
+                const dataString = dia.toISOString().split('T')[0];
+                diaDiv.addEventListener('click', () => selecionarDia(dia, diaDiv));
+                
+                // Marcar dia atual
+                if (dia.toDateString() === hoje.toDateString()) {
+                    diaDiv.classList.add('bg-blue-100', 'border-blue-500');
+                }
+                
+                calendario.appendChild(diaDiv);
+            }
+        }
+
+        function selecionarDia(dia, elemento) {
+            // Remover seleção anterior
+            document.querySelectorAll('#calendario > div').forEach(div => {
+                div.classList.remove('bg-green-100', 'border-green-500');
+            });
+            
+            // Adicionar seleção atual
+            elemento.classList.add('bg-green-100', 'border-green-500');
+            
+            diaSelecionado = dia;
+            document.getElementById('diaSelecionado').textContent = 
+                `Horários para ${dia.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}`;
+            
+            gerarHorarios(dia);
+        }
+
+        function gerarHorarios(dia) {
+            const horariosDiv = document.getElementById('horariosDisponiveis');
+            const dataString = dia.toISOString().split('T')[0];
+            const agendamentosHoje = agendamentos[dataString] || [];
+            
+            horariosDiv.innerHTML = '';
+            
+            horariosFuncionamento.forEach(horario => {
+                const horarioDiv = document.createElement('div');
+                const ocupado = agendamentosHoje.includes(horario);
+                
+                horarioDiv.className = `text-center p-2 rounded border cursor-pointer transition-colors ${
+                    ocupado 
+                        ? 'bg-red-100 border-red-300 text-red-600 cursor-not-allowed' 
+                        : 'hover:bg-blue-50 border-gray-300'
+                }`;
+                
+                horarioDiv.textContent = horario;
+                
+                if (!ocupado) {
+                    horarioDiv.addEventListener('click', () => selecionarHorario(horario, horarioDiv));
+                } else {
+                    horarioDiv.innerHTML += '<br><small>Ocupado</small>';
+                }
+                
+                horariosDiv.appendChild(horarioDiv);
+            });
+        }
+
+        function selecionarHorario(horario, elemento) {
+            // Remover seleção anterior
+            document.querySelectorAll('#horariosDisponiveis > div').forEach(div => {
+                div.classList.remove('bg-green-100', 'border-green-500');
+            });
+            
+            // Adicionar seleção atual
+            elemento.classList.add('bg-green-100', 'border-green-500');
+            
+            horarioSelecionado = horario;
+            verificarAgendamento();
+        }
+
+        function verificarAgendamento() {
+            const botao = document.getElementById('confirmarAgendamento');
+            const botaoCarrinho = document.getElementById('finalizarCarrinho');
+            const podeAgendar = carrinho.length > 0 && diaSelecionado && horarioSelecionado;
+            
+            if (botao) botao.disabled = !podeAgendar;
+            if (botaoCarrinho) botaoCarrinho.disabled = !podeAgendar;
+        }
+
+        // Função para expandir/recolher carrinho
+        function toggleCarrinho() {
+            const conteudo = document.getElementById('conteudoCarrinho');
+            const texto = document.getElementById('setaCarrinho');
+            
+            if (conteudo.style.display === 'none') {
+                conteudo.style.display = 'block';
+                texto.textContent = 'FECHAR';
+            } else {
+                conteudo.style.display = 'none';
+                texto.textContent = 'ABRIR';
+            }
+        }
+
+        // Event listeners
+        document.getElementById('semanaAnterior').addEventListener('click', () => {
+            semanaAtual--;
+            gerarCalendario();
+        });
+
+        document.getElementById('proximaSemana').addEventListener('click', () => {
+            semanaAtual++;
+            gerarCalendario();
+        });
+
+        function finalizarAgendamento() {
+            if (carrinho.length === 0 || !diaSelecionado || !horarioSelecionado) return;
+            
+            // Abrir modal para coletar dados do cliente
+            document.getElementById('modalCliente').classList.remove('hidden');
+        }
+
+        function fecharModal() {
+            document.getElementById('modalCliente').classList.add('hidden');
+            document.getElementById('nomeCliente').value = '';
+            document.getElementById('telefoneCliente').value = '';
+        }
+
+        function confirmarComDados() {
+            const nomeCliente = document.getElementById('nomeCliente').value.trim();
+            const telefoneCliente = document.getElementById('telefoneCliente').value.trim();
+            
+            if (!nomeCliente || !telefoneCliente) {
+                alert('Por favor, preencha todos os campos!');
+                return;
+            }
+            
+            const dataString = diaSelecionado.toISOString().split('T')[0];
+            
+            // Preparar mensagem para WhatsApp
+            const servicos = carrinho.map(item => `${item.name} (${item.quantity}x) - R$ ${(item.price * item.quantity).toFixed(2)}`).join('\n');
+            const total = carrinho.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2);
+            
+            const mensagem = `*NOVO AGENDAMENTO - BARBEARIA PREMIUM*
+
+*Data:* ${diaSelecionado.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+*Horario:* ${horarioSelecionado}
+
+*Cliente:* ${nomeCliente}
+*Telefone:* ${telefoneCliente}
+
+*Serviços Escolhidos:*
+${servicos}
+
+*Total:* R$ ${total}
+
+Aguardo confirmação!`;
+
+            // Número do WhatsApp da barbearia (substitua pelo número real)
+            const numeroWhatsApp = '5531993667152'; // Formato: código do país + DDD + número
+            
+            // Criar URL do WhatsApp
+            const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensagem)}`;
+            
+            // Adicionar agendamento
+            if (!agendamentos[dataString]) {
+                agendamentos[dataString] = [];
+            }
+            agendamentos[dataString].push(horarioSelecionado);
+            
+            // Abrir WhatsApp
+            window.open(urlWhatsApp, '_blank');
+            
+            // Mostrar confirmação
+            alert('Redirecionando para o WhatsApp para confirmar seu agendamento!');
+            
+            // Fechar modal e limpar dados
+            fecharModal();
+            
+            // Limpar seleções
+            carrinho = [];
+            diaSelecionado = null;
+            horarioSelecionado = null;
+            
+            atualizarCarrinho();
+            gerarHorarios(diaSelecionado || new Date());
+            
+            // Remover seleções visuais
+            document.querySelectorAll('.bg-green-100').forEach(el => {
+                el.classList.remove('bg-green-100', 'border-green-500');
+            });
+        }
+
+        document.getElementById('confirmarAgendamento').addEventListener('click', finalizarAgendamento);
+        document.getElementById('finalizarCarrinho').addEventListener('click', finalizarAgendamento);
+
+
+
+        // Máscara para telefone
+        document.getElementById('telefoneCliente').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length <= 11) {
+                value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+                if (value.length < 14) {
+                    value = value.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+                }
+                e.target.value = value;
+            }
+        });
+
+        // Inicializar
+        gerarCalendario();
+        atualizarCarrinho();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9799d379963764ba',t:'MTc1Njk1MDUyMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
